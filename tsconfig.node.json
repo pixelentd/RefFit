@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./node_modules/.tsc-out/node",
+    "tsBuildInfoFile": "./node_modules/.tsc-out/node/tsconfig.node.tsbuildinfo"
+  },
+  "include": ["vite.config.ts", "capacitor.config.ts"]
+}

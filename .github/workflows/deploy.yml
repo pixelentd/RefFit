@@ -1,0 +1,49 @@
+name: Deploy to Hostinger
+
+# Every push to main builds the app and FTPs the built dist/ folder to Hostinger. No paid
+# GitHub features involved — Actions minutes are free for a public repo, and generous on a
+# private one too for a project this small.
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy over FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          # --- server-dir -----------------------------------------------------------
+          # Your Hostinger web root. Set the repo VARIABLE "FTP_SERVER_DIR" (Settings ->
+          # Secrets and variables -> Actions -> Variables tab, not Secrets — it isn't
+          # sensitive) to override the fallback below. Typical values:
+          #   - Primary domain on the plan:              public_html/
+          #   - An addon domain / subdomain of its own:  public_html/your-subdomain/
+          #     (check hPanel -> Domains -> that domain's "Manage" page for its exact docroot)
+          # FTP-Deploy-Action needs a trailing slash either way.
+          server-dir: ${{ vars.FTP_SERVER_DIR || './public_html/' }}
+          # --- clean slate (off by default) ------------------------------------------
+          # dangerous-clean-slate deletes server files that no longer exist in dist/ before
+          # uploading, i.e. a true mirror. Only turn this on if server-dir is DEDICATED to
+          # this app — it will just as happily delete anything else living there.
+          # dangerous-clean-slate: true

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>RefFit</title>
+
+    <!-- Browser chrome color, light/dark aware — matches index.css's --bg. The manifest's own
+         theme_color (vite.config.ts) has no media-query support, so it stays one fixed value;
+         this is the responsive counterpart for when the site isn't installed/is mid-transition. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f4f6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f0f11" />
+
+    <!-- iOS "Add to Home Screen": without these, Safari installs a bookmark, not a standalone,
+         full-screen app icon. -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" href="/icons/icon-192.png" type="image/png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="RefFit" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

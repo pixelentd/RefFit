@@ -1,0 +1,37 @@
+# Copied into dist/ unmodified by Vite on every build (anything in public/ is copied as-is) —
+# edit this file, not a copy under dist/.
+
+# --- MIME type ----------------------------------------------------------------
+# Apache doesn't know the .webmanifest extension out of the box; without this, some browsers
+# refuse to treat manifest.webmanifest as a valid web app manifest and the install prompt/
+# Add-to-Home-Screen metadata (icons, display: standalone, etc.) silently doesn't apply.
+AddType application/manifest+json .webmanifest
+
+# --- Caching --------------------------------------------------------------------
+# Hashed build assets (assets/index-<hash>.js, assets/index-<hash>.css, ...) are safe to cache
+# for a long time: a new deploy always produces a new filename, so there's never a stale-cache
+# problem for them. The service worker script, its Workbox helper chunk, the SW-registration
+# script, and the manifest are NOT hashed — Workbox's "autoUpdate" relies on the browser
+# re-checking sw.js on every visit, so those must never be long-cached, or updates stop
+# reaching the phone. index.html is unhashed for the same reason.
+#
+# Order matters here: mod_headers applies every matching <FilesMatch> block in the order they
+# appear below, and a later "Header set" overwrites an earlier one for the same file — so the
+# no-cache block for sw.js etc. is deliberately placed AFTER the long-cache block, even though
+# sw.js also matches the generic "*.js" pattern above it.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2?|png|jpg|jpeg|svg|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  <FilesMatch "^(sw|workbox-.*|registerSW)\.js$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(html|webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# No SPA rewrite here on purpose: App.tsx does its own in-memory screen switching (see
+# src/App.tsx) — there's no client-side router and no alternate URL path ever gets requested,
+# so there's nothing for the server to fall back to index.html for.
